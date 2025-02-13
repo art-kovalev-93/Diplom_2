@@ -16,7 +16,7 @@ WRONG_LOGIN_DATA_ERR = {
 SUCCESS_LOGIN = {
 "success": True,
 "user": {
-"email": "test-user-kovalev-a@yandex.ru",
+"email": "1test-user-kovalev-a@yandex.ru",
 "name": "Testname"
 }
 }

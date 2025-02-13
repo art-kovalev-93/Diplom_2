@@ -1,5 +1,5 @@
 USER_DATA = {
-"email": "test-user-kovalev-a@yandex.ru",
+"email": "1test-user-kovalev-a@yandex.ru",
 "password": "password",
 "name": "Testname"
 }

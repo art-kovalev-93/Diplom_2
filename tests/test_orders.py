@@ -16,90 +16,46 @@ class TestOrdersApi:
         yield response
         user.delete(access_token=response.json().get('accessToken'))
 
-    @allure.title('Получение списка ингредиентов, проверка кода ответа 200.')
+    @allure.title('Получение списка ингредиентов, проверка кода ответа 200 и проверка тела ответа.')
     def test_get_ingredients_success_200(self):
         order = OrderApi()
         response = order.get_orders()
-        assert response.status_code == 200
+        assert response.status_code == 200 and response.json().get('success') == True
 
-    @allure.title('Получение списка ингредиентов, проверка тела ответа, success.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ')
-    def test_get_ingredients_success_body(self):
-        order = OrderApi()
-        response = order.get_orders()
-        assert response.json().get('success') == True
-
-    @allure.title('Создание нового заказа, авторизированный пользователь, код ответа 200.')
+    @allure.title('Создание нового заказа, авторизированный пользователь, код ответа 200 и тело ответа success..')
     def test_create_order_success_200(self, new_user):
         order = OrderApi()
         response = order.create_order(access_token=new_user.json().get('accessToken'), ingredients=Generator.get_receipt())
-        assert response.status_code == 200
+        assert response.status_code == 200 and response.json().get('success') == True
 
-    @allure.title('Создание нового заказа, авторизированный пользователь, тело ответа success.')
-    def test_create_order_success_body(self, new_user):
-        order = OrderApi()
-        response = order.create_order(access_token=new_user.json().get('accessToken'), ingredients=Generator.get_receipt())
-        assert response.json().get('success') == True
-
-    @allure.title('Создание нового заказа, НЕ авторизированный пользователь, код ответа 200.')
+    @allure.title('Создание нового заказа, НЕ авторизированный пользователь, код ответа 200 и  тело ответа success..')
     def test_create_order_success_no_auth_200(self):
         order = OrderApi()
         response = order.create_order(access_token='', ingredients=Generator.get_receipt())
-        assert response.status_code == 200
+        assert response.status_code == 200 and response.json().get('success') == True
 
-    @allure.title('Создание нового заказа, НЕ авторизированный пользователь, тело ответа success.')
-    def test_create_order_success_no_auth_body(self):
-        order = OrderApi()
-        response = order.create_order(access_token='', ingredients=Generator.get_receipt())
-        assert response.json().get('success') == True
-
-    @allure.title('Создание нового заказа без ингредиентов, авторизированный пользователь, код ответа 400.')
+    @allure.title('Создание нового заказа без ингредиентов, авторизированный пользователь, код ответа 400 и тело ответа success.')
     def test_create_order_fail_no_ingredients_400(self, new_user):
         order = OrderApi()
         response = order.create_order(access_token=new_user.json().get('accessToken'), ingredients=[])
-        assert response.status_code == 400
+        assert response.status_code == 400 and response.json().get('success') == False
 
-    @allure.title('Создание нового заказа без ингредиентов, авторизированный пользователь, тело ответа success')
-    def test_create_order_fail_no_ingredients_body(self, new_user):
-        order = OrderApi()
-        response = order.create_order(access_token=new_user.json().get('accessToken'), ingredients=[])
-        assert response.json().get('success') == False
-
-    @allure.title('Создание нового заказа с неверным id ингредиентов, авторизированный пользователь, код ответа 500.')
+    @allure.title('Создание нового заказа с неверным id ингредиентов, авторизированный пользователь, код ответа 500 Error.')
     def test_create_order_fail_wrong_id_ingredient_500(self, new_user):
         order = OrderApi()
         response = order.create_order(access_token=new_user.json().get('accessToken'), ingredients=["6123456"])
-        assert response.status_code == 500
+        assert response.status_code == 500 and 'Error' in response.text
 
-    @allure.title('Создание нового заказа с неверным id ингредиентов, авторизированный пользователь, тело ответа Error.')
-    def test_create_order_fail_wrong_id_ingredient_body(self, new_user):
-        order = OrderApi()
-        response = order.create_order(access_token=new_user.json().get('accessToken'), ingredients=["6123456"])
-        assert 'Error' in response.text
-
-    @allure.title('Получение списка заказов пользователя, авторизированный пользователь, код ответа 200.')
+    @allure.title('Получение списка заказов пользователя, авторизированный пользователь, код ответа 200, тело ответа Success и кол-во заказов..')
     def test_get_user_order_success_200(self, new_user):
         order = OrderApi()
         order.create_order(access_token=new_user.json().get('accessToken'), ingredients=Generator.get_receipt())
         response = order.get_user_orders(access_token=new_user.json().get('accessToken'))
-        assert response.status_code == 200
+        assert response.status_code == 200 and response.json().get('success') == True and len(response.json().get('orders')) == 1
 
-    @allure.title('Получение списка заказов пользователя, авторизированный пользователь, тело ответа Success и кол-во заказов.')
-    def test_get_user_order_success_body(self, new_user):
-        order = OrderApi()
-        order.create_order(access_token=new_user.json().get('accessToken'), ingredients=Generator.get_receipt())
-        response = order.get_user_orders(access_token=new_user.json().get('accessToken'))
-        assert response.json().get('success') == True and len(response.json().get('orders')) == 1
-
-    @allure.title('Получение списка заказов пользователя, не авторизированный пользователь, код ответа 401.')
+    @allure.title('Получение списка заказов пользователя, не авторизированный пользователь, код ответа 401 и тело ответа Success.')
     def test_get_user_order_fail_401(self, new_user):
         order = OrderApi()
         order.create_order(access_token=new_user.json().get('accessToken'), ingredients=Generator.get_receipt())
         response = order.get_user_orders(access_token='')
-        assert response.status_code == 401
-
-    @allure.title('Получение списка заказов пользователя, НЕ авторизированный пользователь, тело ответа Success.')
-    def test_get_user_order_fail_body(self, new_user):
-        order = OrderApi()
-        order.create_order(access_token=new_user.json().get('accessToken'), ingredients=Generator.get_receipt())
-        response = order.get_user_orders(access_token='')
-        assert response.json() == UNAUTH_ERR
+        assert response.status_code == 401 and response.json() == UNAUTH_ERR
